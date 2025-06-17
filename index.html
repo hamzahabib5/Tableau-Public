@@ -5,25 +5,41 @@
   <title>ASTAR Joe Dashboard</title>
   <style>
     body {
-      font-family: sans-serif;
       margin: 0;
       padding: 0;
       text-align: center;
     }
-    iframe {
+    #tableauViz {
       width: 100%;
       height: 90vh;
-      border: none;
     }
   </style>
 </head>
 <body>
 
-  <h1>ASTAR Joe Dashboard</h1>
+  <h1>ASTAR Joe Interactive Dashboard</h1>
+  <div id="tableauViz"></div>
 
-  <iframe src="https://public.tableau.com/views/ASTAR_Joecopy/Dashboard1?:embed=y&:display_count=yes"
-          allowfullscreen>
-  </iframe>
+  <!-- Load Tableau JS API -->
+  <script src="https://public.tableau.com/javascripts/api/tableau-2.min.js"></script>
+
+  <script>
+    var viz;  // global viz object
+
+    var containerDiv = document.getElementById("tableauViz");
+    var url = "https://public.tableau.com/views/ASTAR_Joecopy/Dashboard1?:embed=y&:display_count=yes";
+
+    var options = {
+      hideTabs: true,
+      width: containerDiv.offsetWidth,
+      height: containerDiv.offsetHeight,
+      onFirstInteractive: function () {
+        console.log("Tableau dashboard loaded!");
+      }
+    };
+
+    viz = new tableau.Viz(containerDiv, url, options);
+  </script>
 
 </body>
 </html>
