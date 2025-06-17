@@ -4,14 +4,29 @@
   <meta charset="UTF-8">
   <title>ASTAR Joe Dashboard</title>
   <style>
-    body {
+    html, body {
       margin: 0;
       padding: 0;
-      text-align: center;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #f9f9f9;
+      font-family: sans-serif;
     }
     #tableauViz {
+      width: 80vw;
+      height: 80vh;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    h1 {
+      position: absolute;
+      top: 20px;
       width: 100%;
-      height: 90vh;
+      text-align: center;
+      margin: 0;
     }
   </style>
 </head>
@@ -20,12 +35,9 @@
   <h1>ASTAR Joe Interactive Dashboard</h1>
   <div id="tableauViz"></div>
 
-  <!-- Load Tableau JS API -->
   <script src="https://public.tableau.com/javascripts/api/tableau-2.min.js"></script>
-
   <script>
-    var viz;  // global viz object
-
+    var viz;
     var containerDiv = document.getElementById("tableauViz");
     var url = "https://public.tableau.com/views/ASTAR_Joecopy/Dashboard1?:embed=y&:display_count=yes";
 
