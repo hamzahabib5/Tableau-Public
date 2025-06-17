@@ -1,57 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>ASTAR Joe Dashboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ASTAR Dashboard</title>
+  <script src="https://public.tableau.com/javascripts/api/tableau-2.min.js"></script>
   <style>
-    html, body {
+    body {
       margin: 0;
-      padding: 0;
-      height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: #f9f9f9;
-      font-family: sans-serif;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
     }
-    #tableauViz {
-      width: 80vw;
-      height: 80vh;
-      box-shadow: 0 0 20px rgba(0,0,0,0.1);
-      border-radius: 8px;
+    header {
+      background: #2c3e50;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      height: 60px;
+    }
+    header .nav {
+      display: flex;
+      gap: 20px;
+    }
+    header .user {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .tabs {
+      display: flex;
+      background: #ecf0f1;
+      padding: 5px;
+    }
+    .tabs button {
+      background: #bdc3c7;
+      border: none;
+      padding: 10px 20px;
+      margin-right: 5px;
+      cursor: pointer;
+      border-radius: 4px 4px 0 0;
+    }
+    .tabs button.active {
+      background: #fff;
+      border-bottom: 2px solid #fff;
+    }
+    .container {
+      display: flex;
+      height: calc(100vh - 100px);
+    }
+    .sidebar {
+      width: 200px;
+      background: #fff;
+      padding: 10px;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    }
+    .sidebar select {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    .main {
+      flex: 1;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+    }
+    .viz-container {
+      flex: 1;
+      background: #fff;
+      border-radius: 6px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
       overflow: hidden;
     }
-    h1 {
-      position: absolute;
-      top: 20px;
-      width: 100%;
-      text-align: center;
-      margin: 0;
+    .summary {
+      background: #2c3e50;
+      color: white;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      text-align: right;
     }
   </style>
 </head>
 <body>
 
-  <h1>ASTAR Joe Interactive Dashboard</h1>
-  <div id="tableauViz"></div>
+<header>
+  <div class="logo">LOGO</div>
+  <div class="nav">
+    <div>🏠 Home</div>
+    <div>📊 Tools</div>
+  </div>
+  <div class="user">User <span>👤</span></div>
+</header>
 
-  <script src="https://public.tableau.com/javascripts/api/tableau-2.min.js"></script>
-  <script>
-    var viz;
-    var containerDiv = document.getElementById("tableauViz");
-    var url = "https://public.tableau.com/views/ASTAR_Joecopy/Dashboard1?:embed=y&:display_count=yes";
+<div class="tabs">
+  <button class="active" onclick="loadDashboard('Dashboard1', this)">Overview</button>
+  <button onclick="loadDashboard('Dashboard2', this)">Status</button>
+  <button onclick="loadDashboard('Dashboard3', this)">Failure Category</button>
+  <button onclick="loadDashboard('Dashboard4', this)">Comparative Data</button>
+</div>
 
-    var options = {
+<div class="container">
+  <div class="sidebar">
+    <select><option>Operator</option></select>
+    <select><option>Company Name</option></select>
+    <select><option>Evaluator Name</option></select>
+    <select><option>Status</option></select>
+    <select><option>Task Name</option></select>
+  </div>
+
+  <div class="main">
+    <div class="summary">
+      Report Total: 239 | Failed: 52 | Passed: 187
+    </div>
+    <div class="viz-container" id="tableauViz"></div>
+  </div>
+</div>
+
+<script>
+  let viz;
+
+  function loadDashboard(viewName, button) {
+    // Remove active class from all buttons
+    document.querySelectorAll('.tabs button').forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+
+    const containerDiv = document.getElementById("tableauViz");
+    const url = `https://public.tableau.com/views/ASTAR_Joecopy/${viewName}?:embed=y&:display_count=yes`;
+
+    // Dispose of old viz if exists
+    if (viz) viz.dispose();
+
+    // Create new viz
+    const options = {
       hideTabs: true,
       width: containerDiv.offsetWidth,
-      height: containerDiv.offsetHeight,
-      onFirstInteractive: function () {
-        console.log("Tableau dashboard loaded!");
-      }
+      height: containerDiv.offsetHeight
     };
 
     viz = new tableau.Viz(containerDiv, url, options);
-  </script>
+  }
+
+  // Load default view
+  loadDashboard('Dashboard1', document.querySelector('.tabs button.active'));
+</script>
 
 </body>
 </html>
