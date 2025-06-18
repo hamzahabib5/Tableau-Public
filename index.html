@@ -10,6 +10,9 @@
       margin: 0;
       font-family: Arial, sans-serif;
       background: #f5f5f5;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
     header {
       background: #2c3e50;
@@ -27,12 +30,13 @@
       display: flex;
       background: #ecf0f1;
       padding: 5px;
+      justify-content: center;
     }
     .tabs button {
       background: #bdc3c7;
       border: none;
       padding: 10px 20px;
-      margin-right: 5px;
+      margin: 0 5px;
       cursor: pointer;
       border-radius: 4px 4px 0 0;
     }
@@ -41,26 +45,20 @@
       border-bottom: 2px solid #fff;
     }
     .container {
-      height: calc(100vh - 100px);
+      flex: 1;
       display: flex;
-      flex-direction: column;
+      justify-content: center;
+      align-items: center;
       padding: 10px;
-    }
-    .summary {
-      background: #2c3e50;
-      color: white;
-      padding: 10px;
-      border-radius: 6px;
-      margin-bottom: 10px;
-      text-align: right;
-      display: none; /* Hidden by default */
     }
     .viz-container {
-      flex: 1;
       background: #fff;
       border-radius: 6px;
       box-shadow: 0 0 10px rgba(0,0,0,0.05);
       overflow: hidden;
+      width: 80%;
+      height: 80vh;
+      max-width: 1200px;
     }
   </style>
 </head>
@@ -75,20 +73,17 @@
 <div class="tabs">
   <button class="active" onclick="loadDashboard('Dashboard1', this)">Overview</button>
   <button onclick="loadDashboard('Dashboard2', this)">Status</button>
-  <button onclick="loadDashboard('Dashboard3', this)">Failure Category</button>
-  <button onclick="loadDashboard('Dashboard4', this)">Comparative Data</button>
+  <button onclick="loadDashboard('Dashboard3', this)">Comparative Data</button>
+  <button onclick="loadDashboard('Dashboard4', this)">Failure Category</button>
+  <button onclick="loadDashboard('Dashboard5', this)">Gap Report</button>
 </div>
 
 <div class="container">
-  <div class="summary" id="summary">
-    Loading summary...
-  </div>
   <div class="viz-container" id="tableauViz"></div>
 </div>
 
 <script>
 let viz;
-let currentDashboard = '';
 
 function loadDashboard(viewName, button) {
   document.querySelectorAll('.tabs button').forEach(btn => btn.classList.remove('active'));
@@ -99,79 +94,13 @@ function loadDashboard(viewName, button) {
 
   if (viz) viz.dispose();
 
-  currentDashboard = viewName;
-  if (viewName === 'Dashboard1') {
-    document.getElementById("summary").style.display = 'block';
-    document.getElementById("summary").innerText = "Loading summary...";
-  } else {
-    document.getElementById("summary").style.display = 'none';
-  }
-
   const options = {
     hideTabs: true,
     width: containerDiv.offsetWidth,
-    height: containerDiv.offsetHeight,
-    onFirstInteractive: function () {
-      console.log(`${viewName} loaded!`);
-      setupListeners();
-      if (viewName === 'Dashboard1') {
-        fetchSummary();
-      }
-    }
+    height: containerDiv.offsetHeight
   };
 
   viz = new tableau.Viz(containerDiv, url, options);
-}
-
-function setupListeners() {
-  viz.removeEventListener(tableau.TableauEventName.FILTER_CHANGE, fetchSummary);
-  viz.removeEventListener(tableau.TableauEventName.MARKS_SELECTION, fetchSummary);
-  viz.removeEventListener(tableau.TableauEventName.PARAMETER_VALUE_CHANGE, fetchSummary);
-
-  if (currentDashboard === 'Dashboard1') {
-    viz.addEventListener(tableau.TableauEventName.FILTER_CHANGE, fetchSummary);
-    viz.addEventListener(tableau.TableauEventName.MARKS_SELECTION, fetchSummary);
-    viz.addEventListener(tableau.TableauEventName.PARAMETER_VALUE_CHANGE, fetchSummary);
-  }
-}
-
-function fetchSummary() {
-  const sheet = viz.getWorkbook().getActiveSheet();
-  let worksheet;
-
-  if (sheet.getSheetType() === 'dashboard') {
-    worksheet = sheet.getWorksheets().get("Sheet 14");
-  }
-
-  if (!worksheet) {
-    document.getElementById("summary").innerText = "Summary sheet not found";
-    return;
-  }
-
-  worksheet.getSummaryDataAsync().then(function(tData) {
-    const data = tData.getData();
-    const columns = tData.getColumns();
-
-    let total = 0;
-    let passed = 0;
-    let failed = 0;
-
-    data.forEach(row => {
-      row.forEach((cell, i) => {
-        const field = columns[i].getFieldName();
-        const value = parseInt(cell.value) || 0;
-        if (field === "Report Total") total = value;
-        if (field === "Passed") passed = value;
-        if (field === "Failed") failed = value;
-      });
-    });
-
-    document.getElementById("summary").innerText =
-      `Report Total: ${total} | Passed: ${passed} | Failed: ${failed}`;
-  }).catch(err => {
-    console.error("Error fetching summary data", err);
-    document.getElementById("summary").innerText = "Summary data not available";
-  });
 }
 
 // Initial load
