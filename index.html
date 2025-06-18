@@ -49,15 +49,16 @@
     }
 
     .viz-container {
-      width: 80%;
-      max-width: 1200px;
-      height: 80vh;
-      background: #fff;
-      margin: 20px auto;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      border-radius: 8px;
-      overflow: hidden;
-    }
+  width: 95%;          /* Increase width (was 80%) */
+  max-width: 1400px;   /* Allow larger max width (was 1200px) */
+  height: 90vh;        /* Make it taller (was 80vh) */
+  background: #fff;
+  margin: 20px auto;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
   </style>
 </head>
 <body>
@@ -90,11 +91,11 @@ function loadDashboard(viewName, btn) {
 
   if (viz) viz.dispose();
 
-  const options = {
-    hideTabs: true,
-    width: containerDiv.offsetWidth,
-    height: containerDiv.offsetHeight
-  };
+const options = {
+  hideTabs: true,
+  width: containerDiv.offsetWidth + "px",   // Optional: explicit width
+  height: containerDiv.offsetHeight + "px"  // Optional: explicit height
+};
 
   viz = new tableau.Viz(containerDiv, url, options);
 }
