@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ASTAR Dashboard</title>
   <script src="https://public.tableau.com/javascripts/api/tableau-2.min.js"></script>
@@ -20,14 +20,8 @@
       padding: 0 20px;
       height: 60px;
     }
-    header .nav {
-      display: flex;
-      gap: 20px;
-    }
-    header .user {
-      display: flex;
-      align-items: center;
-      gap: 5px;
+    .logo img {
+      height: 40px;
     }
     .tabs {
       display: flex;
@@ -47,31 +41,10 @@
       border-bottom: 2px solid #fff;
     }
     .container {
-      display: flex;
       height: calc(100vh - 100px);
-    }
-    .sidebar {
-      width: 200px;
-      background: #fff;
-      padding: 10px;
-      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-    }
-    .sidebar select {
-      width: 100%;
-      margin-bottom: 10px;
-    }
-    .main {
-      flex: 1;
-      padding: 10px;
       display: flex;
       flex-direction: column;
-    }
-    .viz-container {
-      flex: 1;
-      background: #fff;
-      border-radius: 6px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
-      overflow: hidden;
+      padding: 10px;
     }
     .summary {
       background: #2c3e50;
@@ -80,6 +53,14 @@
       border-radius: 6px;
       margin-bottom: 10px;
       text-align: right;
+      display: none; /* Hidden by default */
+    }
+    .viz-container {
+      flex: 1;
+      background: #fff;
+      border-radius: 6px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      overflow: hidden;
     }
   </style>
 </head>
@@ -87,51 +68,114 @@
 
 <header>
   <div class="logo">
-  <img src="https://raw.githubusercontent.com/hamzahabib5/Tableau-Public/main/app-logo-on-light.png" alt="Company Logo" style="height:40px;">
+    <img src="https://raw.githubusercontent.com/hamzahabib5/Tableau-Public/main/app-logo-on-light.png" alt="Company Logo">
   </div>
-  <div class="nav">
-    <div>🏠 Home</div>
-    <div>📊 Tools</div>
-  </div>
-  <div class="user">User <span>👤</span></div>
 </header>
 
 <div class="tabs">
   <button class="active" onclick="loadDashboard('Dashboard1', this)">Overview</button>
   <button onclick="loadDashboard('Dashboard2', this)">Status</button>
-  <button onclick="loadDashboard('Dashboard3', this)">Comparative Data</button>
-  <button onclick="loadDashboard('Dashboard4', this)">Failure Category</button>
-  <button onclick="loadDashboard('Dashboard5', this)">Gap Report</button>
+  <button onclick="loadDashboard('Dashboard3', this)">Failure Category</button>
+  <button onclick="loadDashboard('Dashboard4', this)">Comparative Data</button>
 </div>
 
- 
+<div class="container">
+  <div class="summary" id="summary">
+    Loading summary...
+  </div>
+  <div class="viz-container" id="tableauViz"></div>
+</div>
 
 <script>
-  let viz;
+let viz;
+let currentDashboard = '';
 
-  function loadDashboard(viewName, button) {
-    // Remove active class from all buttons
-    document.querySelectorAll('.tabs button').forEach(btn => btn.classList.remove('active'));
-    button.classList.add('active');
+function loadDashboard(viewName, button) {
+  document.querySelectorAll('.tabs button').forEach(btn => btn.classList.remove('active'));
+  button.classList.add('active');
 
-    const containerDiv = document.getElementById("tableauViz");
-    const url = `https://public.tableau.com/views/ASTAR_Joecopy/${viewName}?:embed=y&:display_count=yes`;
+  const containerDiv = document.getElementById("tableauViz");
+  const url = `https://public.tableau.com/views/ASTAR_Joecopy/${viewName}?:embed=y&:display_count=yes`;
 
-    // Dispose of old viz if exists
-    if (viz) viz.dispose();
+  if (viz) viz.dispose();
 
-    // Create new viz
-    const options = {
-      hideTabs: true,
-      width: containerDiv.offsetWidth,
-      height: containerDiv.offsetHeight
-    };
-
-    viz = new tableau.Viz(containerDiv, url, options);
+  currentDashboard = viewName;
+  if (viewName === 'Dashboard1') {
+    document.getElementById("summary").style.display = 'block';
+    document.getElementById("summary").innerText = "Loading summary...";
+  } else {
+    document.getElementById("summary").style.display = 'none';
   }
 
-  // Load default view
-  loadDashboard('Dashboard1', document.querySelector('.tabs button.active'));
+  const options = {
+    hideTabs: true,
+    width: containerDiv.offsetWidth,
+    height: containerDiv.offsetHeight,
+    onFirstInteractive: function () {
+      console.log(`${viewName} loaded!`);
+      setupListeners();
+      if (viewName === 'Dashboard1') {
+        fetchSummary();
+      }
+    }
+  };
+
+  viz = new tableau.Viz(containerDiv, url, options);
+}
+
+function setupListeners() {
+  viz.removeEventListener(tableau.TableauEventName.FILTER_CHANGE, fetchSummary);
+  viz.removeEventListener(tableau.TableauEventName.MARKS_SELECTION, fetchSummary);
+  viz.removeEventListener(tableau.TableauEventName.PARAMETER_VALUE_CHANGE, fetchSummary);
+
+  if (currentDashboard === 'Dashboard1') {
+    viz.addEventListener(tableau.TableauEventName.FILTER_CHANGE, fetchSummary);
+    viz.addEventListener(tableau.TableauEventName.MARKS_SELECTION, fetchSummary);
+    viz.addEventListener(tableau.TableauEventName.PARAMETER_VALUE_CHANGE, fetchSummary);
+  }
+}
+
+function fetchSummary() {
+  const sheet = viz.getWorkbook().getActiveSheet();
+  let worksheet;
+
+  if (sheet.getSheetType() === 'dashboard') {
+    worksheet = sheet.getWorksheets().get("Sheet 14");
+  }
+
+  if (!worksheet) {
+    document.getElementById("summary").innerText = "Summary sheet not found";
+    return;
+  }
+
+  worksheet.getSummaryDataAsync().then(function(tData) {
+    const data = tData.getData();
+    const columns = tData.getColumns();
+
+    let total = 0;
+    let passed = 0;
+    let failed = 0;
+
+    data.forEach(row => {
+      row.forEach((cell, i) => {
+        const field = columns[i].getFieldName();
+        const value = parseInt(cell.value) || 0;
+        if (field === "Report Total") total = value;
+        if (field === "Passed") passed = value;
+        if (field === "Failed") failed = value;
+      });
+    });
+
+    document.getElementById("summary").innerText =
+      `Report Total: ${total} | Passed: ${passed} | Failed: ${failed}`;
+  }).catch(err => {
+    console.error("Error fetching summary data", err);
+    document.getElementById("summary").innerText = "Summary data not available";
+  });
+}
+
+// Initial load
+loadDashboard('Dashboard1', document.querySelector('.tabs button.active'));
 </script>
 
 </body>
