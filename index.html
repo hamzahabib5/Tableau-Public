@@ -1,64 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ASTAR Dashboard</title>
   <script src="https://public.tableau.com/javascripts/api/tableau-2.min.js"></script>
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
+      padding: 0;
       background: #f5f5f5;
       display: flex;
       flex-direction: column;
-      min-height: 100vh;
+      align-items: center;
     }
+
     header {
       background: #2c3e50;
-      color: white;
+      width: 100%;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0 20px;
-      height: 60px;
+      padding: 10px 20px;
     }
+
     .logo img {
       height: 40px;
     }
+
     .tabs {
       display: flex;
-      background: #ecf0f1;
-      padding: 5px;
       justify-content: center;
+      background: #ecf0f1;
+      width: 100%;
     }
+
     .tabs button {
       background: #bdc3c7;
       border: none;
       padding: 10px 20px;
-      margin: 0 5px;
+      margin: 5px;
+      border-radius: 4px;
       cursor: pointer;
-      border-radius: 4px 4px 0 0;
     }
+
     .tabs button.active {
       background: #fff;
-      border-bottom: 2px solid #fff;
     }
-    .container {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 10px;
-    }
+
     .viz-container {
-      background: #fff;
-      border-radius: 6px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
-      overflow: hidden;
       width: 80%;
-      height: 80vh;
       max-width: 1200px;
+      height: 80vh;
+      background: #fff;
+      margin: 20px auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      overflow: hidden;
     }
   </style>
 </head>
@@ -66,7 +64,7 @@
 
 <header>
   <div class="logo">
-    <img src="https://raw.githubusercontent.com/hamzahabib5/Tableau-Public/main/app-logo-on-light.png" alt="Company Logo">
+    <img src="https://raw.githubusercontent.com/hamzahabib5/Tableau-Public/main/app-logo-on-light.png" alt="Logo" />
   </div>
 </header>
 
@@ -78,16 +76,14 @@
   <button onclick="loadDashboard('Dashboard5', this)">Gap Report</button>
 </div>
 
-<div class="container">
-  <div class="viz-container" id="tableauViz"></div>
-</div>
+<div class="viz-container" id="tableauViz"></div>
 
 <script>
 let viz;
 
-function loadDashboard(viewName, button) {
-  document.querySelectorAll('.tabs button').forEach(btn => btn.classList.remove('active'));
-  button.classList.add('active');
+function loadDashboard(viewName, btn) {
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
 
   const containerDiv = document.getElementById("tableauViz");
   const url = `https://public.tableau.com/views/ASTAR_Joecopy/${viewName}?:embed=y&:display_count=yes`;
@@ -103,7 +99,7 @@ function loadDashboard(viewName, button) {
   viz = new tableau.Viz(containerDiv, url, options);
 }
 
-// Initial load
+// load first view on page load
 loadDashboard('Dashboard1', document.querySelector('.tabs button.active'));
 </script>
 
