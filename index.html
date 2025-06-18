@@ -99,26 +99,12 @@
 <div class="tabs">
   <button class="active" onclick="loadDashboard('Dashboard1', this)">Overview</button>
   <button onclick="loadDashboard('Dashboard2', this)">Status</button>
-  <button onclick="loadDashboard('Dashboard3', this)">Failure Category</button>
-  <button onclick="loadDashboard('Dashboard4', this)">Comparative Data</button>
+  <button onclick="loadDashboard('Dashboard3', this)">Comparative Data</button>
+  <button onclick="loadDashboard('Dashboard4', this)">Failure Category</button>
+  <button onclick="loadDashboard('Dashboard5', this)">Gap Report</button>
 </div>
 
-<div class="container">
-  <div class="sidebar">
-    <select><option>Operator</option></select>
-    <select><option>Company Name</option></select>
-    <select><option>Evaluator Name</option></select>
-    <select><option>Status</option></select>
-    <select><option>Task Name</option></select>
-  </div>
-
-  <div class="main">
-    <div class="summary">
-      Report Total: 239 | Failed: 52 | Passed: 187
-    </div>
-    <div class="viz-container" id="tableauViz"></div>
-  </div>
-</div>
+ 
 
 <script>
   let viz;
