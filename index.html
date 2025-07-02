@@ -60,6 +60,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
 }
 
   </style>
@@ -96,8 +97,8 @@ function loadDashboard(viewName, btn) {
 
 const options = {
   hideTabs: true,
-  width: containerDiv.offsetWidth + "px",   // Optional: explicit width
-  height: containerDiv.offsetHeight + "px"  // Optional: explicit height
+  width: "1000px",   // Fixed width for better centering
+  height: "800px"
 };
 
   viz = new tableau.Viz(containerDiv, url, options);
